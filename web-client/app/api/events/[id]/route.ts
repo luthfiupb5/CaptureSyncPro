@@ -3,10 +3,10 @@ import { db } from '@/lib/db';
 
 export async function DELETE(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = params.id;
+        const { id } = await params;
         await db.deleteEvent(id);
         return NextResponse.json({ success: true });
     } catch (e) {

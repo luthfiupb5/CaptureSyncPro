@@ -1,4 +1,5 @@
 import { PrismaClient, User, Event, Photo } from '@prisma/client';
+export type { User, Event, Photo };
 import * as faceapi from 'face-api.js';
 
 // Prevent multiple instances of Prisma Client in development

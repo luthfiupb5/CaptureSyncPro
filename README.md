@@ -1,68 +1,83 @@
-# CaptureSync Pro
+# CaptureSync Pro (Web Edition)
 
-**Automated Image Overlay & Cloud Sync Tool (Windows GUI Edition)**
+**AI-Powered Event Photo Distribution Platform**
 
-CaptureSync is a professional automation tool designed for photographers and event organizers. It acts as a real-time bridge between your camera (or Lightroom export folder) and Google Drive, immediately applying branding overlays and syncing files for instant sharing.
+CaptureSync Pro has evolved from a local Python executable into a comprehensive web-based platform. It uses face recognition technology to automatically identify and distribute photos to event attendees, streamlining the workflow for photographers and organizers.
 
-**v5.0 brings a complete graphical user interface (GUI), no terminal required!**
+## ✨ Key Features
 
-![CaptureSync GUI](https://via.placeholder.com/800x400?text=CaptureSync+v5.0+GUI) 
-*(Screenshot placeholder)*
+-   **🔍 AI Face Recognition**: Automatically matches attendees to their photos using `face-api.js`.
+-   **� Cloud Storage**: Securely stores high-resolution images using **Supabase Storage**, eliminating local storage limits.
+-   **⚡ Real-Time Admin Dashboard**:
+    -   Manage multiple events.
+    -   Upload photos directly (Single or Bulk).
+    -   Monitor uploads and system status.
+-   **� Modern Client Gallery**: A beautiful, responsive gallery for attendees to find their photos instantly by uploading a selfie.
+-   **� Role-Based Access**: Secure login for Super Admins and Program Admins.
 
-## ✨ What's New in v5.0?
+## �️ Technology Stack
 
-- **🖥️ Full GUI Interface**: A modern, dark-themed (CustomTkinter) app. No more black command-line windows.
-- **🖼️ Flex-Overlay Logic**: 
-    - You only need *one* overlay (Landscape OR Portrait).
-    - **Square Support**: 1:1 images are automatically handled using the Landscape overlay.
-- **👁️ Live Gallery**: Watch processed images appear in real-time in the new "Gallery" tab.
-- **📂 Process Existing Files**: One-click option to process photos already sitting in your folder.
-- **📊 Live Progress**: Real-time progress bar and "Processed / Total" counter.
-- **🛑 Instant Stop**: Stop button now halts processing immediately.
+-   **Frontend**: Next.js 15 (React 19), Tailwind CSS 4
+-   **Backend**: Next.js API Routes (Serverless)
+-   **Database**: PostgreSQL (via Prisma ORM)
+-   **Storage**: Supabase Storage
+-   **AI Model**: Face-API.js (TensorFlow.js)
 
-## 🚀 Key Features
+## 🚀 Getting Started
 
-- **Real-time Watcher**: Detects new images the moment they hit the folder.
-- **Smart Orientation**: Automatically applies the correct overlay (Landscape vs Portrait).
-- **Auto-Naming**: Options to keep original filenames or use a custom prefix sequence (e.g., `EventName_1.jpg`).
-- **Instant Cloud Sync**: Saves directly to your Google Drive Desktop folder for immediate upload.
+### Prerequisites
 
-## 🛠️ Usage (The Easy Way)
+-   **Node.js** (v18 or higher)
+-   **Supabase Account** (for Storage)
+-   **PostgreSQL Database** (Local or Cloud)
 
-**No Python? No Problem.** CaptureSync is now a standalone Windows Application.
+### Installation
 
-1.  **Download**: Get `CaptureSync.exe` from the [Releases](https://github.com/luthfiupb5/CaptureSync/releases) page.
-2.  **Run**: Double-click the file. (No installation needed!)
-3.  **Configure**:
-    *   **Source Folder**: Browse to your Camera/Lightroom export folder.
-    *   **Overlays**: Browse to your transparent PNG frames.
-    *   **Output Folder**: Browse to your Google Drive folder.
-4.  **Start**: Click **Start Automation**.
-
-That's it! As you take photos, they will automatically be processed and appear in your Gallery tab and your Drive folder.
-
-## ⚙️ Requirements
-
-- **Operating System**: Windows 10 or 11.
-- **Cloud Sync**: Google Drive for Desktop (or Dropbox/OneDrive) recommended for the sync feature.
-
-## 👨‍💻 For Developers
-
-If you want to run from source:
-
-1.  **Clone**:
+1.  **Clone the Repository**
     ```bash
     git clone https://github.com/luthfiupb5/CaptureSync.git
-    cd CaptureSync
+    cd CaptureSync/web-client
     ```
-2.  **Install**:
+
+2.  **Install Dependencies**
     ```bash
-    pip install -r requirements.txt
+    npm install
     ```
-3.  **Run**:
+
+3.  **Environment Setup**
+    Create a `.env` file in the `web-client` directory with the following variables:
+    ```env
+    # Database (Prisma)
+    DATABASE_URL="postgresql://user:password@localhost:5432/capturesync"
+
+    # Authentication (JWT Secret)
+    JWT_SECRET="your-super-secret-key"
+
+    # Supabase Storage (Public/Anon Key)
+    NEXT_PUBLIC_SUPABASE_URL="your-supabase-url"
+    NEXT_PUBLIC_SUPABASE_ANON_KEY="your-anon-key"
+    
+    # Supabase Admin (Service Role - for server-side uploads)
+    SUPABASE_SERVICE_ROLE_KEY="your-service-role-key"
+    ```
+
+4.  **Database Migration**
     ```bash
-    python -m capturesync.main
+    npx prisma migrate dev --name init
+    npx prisma generate
     ```
+
+5.  **Run Development Server**
+    ```bash
+    npm run dev
+    ```
+
+    Open [http://localhost:3000](http://localhost:3000) to verify.
+
+## 👥 Usage
+
+-   **Admin Panel**: Navigate to `/admin/login` to access the dashboard. (Default credentials needed if seeded).
+-   **Client View**: The homepage `/` serves as the attendee portal to search for photos.
 
 ## 👤 Credits
 
@@ -71,4 +86,4 @@ If you want to run from source:
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-blue?style=flat&logo=linkedin)](https://www.linkedin.com/in/luthfibassamup/)
 
 ---
-*Built with ❤️ Luthfi Bassam U P*
+*Built with ❤️ by Luthfi Bassam U P*

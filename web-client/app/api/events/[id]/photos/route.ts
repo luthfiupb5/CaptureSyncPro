@@ -3,10 +3,10 @@ import { db } from '@/lib/db';
 
 export async function GET(
     req: NextRequest,
-    { params }: { params: { id: string } }
+    { params }: { params: Promise<{ id: string }> }
 ) {
     try {
-        const id = params.id;
+        const { id } = await params;
         const photos = await db.getPhotos(id);
         return NextResponse.json(photos);
     } catch (e) {

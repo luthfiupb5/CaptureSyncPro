@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { writeFile, mkdir } from 'fs/promises';
-import { join } from 'path';
+import { supabaseAdmin } from '@/lib/supabase-admin';
 
 export async function POST(req: Request) {
     try {
@@ -14,23 +13,33 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        const buffer = Buffer.from(await file.arrayBuffer());
+        const buffer = await file.arrayBuffer();
         const vectors = JSON.parse(vectorsStr);
 
-        // Ensure upload directory exists
-        // Structure: public/uploads/{eventId}/{filename}
-        const uploadDir = join(process.cwd(), 'public', 'uploads', eventId);
-        await mkdir(uploadDir, { recursive: true });
-
+        // Upload to Supabase Storage
         const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
-        const filePath = join(uploadDir, filename);
+        const filePath = `${eventId}/${filename}`;
 
-        // Save file locally
-        await writeFile(filePath, buffer);
+        const { data, error } = await supabaseAdmin
+            .storage
+            .from('photos')
+            .upload(filePath, buffer, {
+                contentType: file.type,
+                upsert: false
+            });
+
+        if (error) {
+            console.error("Supabase Upload Error:", error);
+            throw error;
+        }
+
+        // Get Public URL
+        const { data: { publicUrl } } = supabaseAdmin
+            .storage
+            .from('photos')
+            .getPublicUrl(filePath);
 
         // Save to DB
-        // URL needs to be accessible by browser: /uploads/{eventId}/{filename}
-        const publicUrl = `/uploads/${eventId}/${filename}`;
         const photo = await db.addPhotoWithVectors(publicUrl, eventId, vectors);
 
         return NextResponse.json({ success: true, photo });

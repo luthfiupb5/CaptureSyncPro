@@ -1,0 +1,7 @@
+{
+    "source_folder": "C:\\Users\\User\\Pictures\\source image",
+    "landscape_overlay": "C:\\Users\\User\\Pictures\\horizontal.png",
+    "portrait_overlay": "C:\\Users\\User\\Pictures\\vertical.png",
+    "output_folder": "C:\\Users\\User\\Pictures\\output",
+    "file_prefix": "Luthfi"
+}

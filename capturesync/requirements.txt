@@ -1,0 +1,7 @@
+watchdog
+Pillow
+rich
+customtkinter
+face_recognition
+numpy
+opencv-python

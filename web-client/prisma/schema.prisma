@@ -1,0 +1,54 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  username  String   @unique
+  password  String   // Plaintext for MVP, hash in prod
+  role      String   // 'super_admin' | 'program_admin'
+  eventId   String?  // Optional, links Program Admin to an Event
+  event     Event?   @relation(fields: [eventId], references: [id])
+  createdAt DateTime @default(now())
+}
+
+model Event {
+  id        String   @id @default(uuid())
+  name      String
+  banner    String?
+  createdAt DateTime @default(now())
+  
+  users     User[]
+  photos    Photo[]
+}
+
+model Photo {
+  id        String   @id @default(uuid())
+  url       String
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+  
+  // One photo can have multiple faces detected
+  vectors   FaceVector[]
+}
+
+model FaceVector {
+  id        String @id @default(uuid())
+  photo     Photo  @relation(fields: [photoId], references: [id], onDelete: Cascade)
+  photoId   String
+  
+  eventId   String // Denormalized for faster searching
+  
+  // SQLite doesn't support Float[], so we store as a JSON string
+  // Format: "[0.123, -0.456, ...]"
+  vectorStr String 
+}

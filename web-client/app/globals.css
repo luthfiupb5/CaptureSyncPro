@@ -2,23 +2,39 @@
 
 /* --- 1. FONTS & ROOT VARIABLES --- */
 :root {
-  --background: #02020A;
-  --foreground: #E2E8F0;
+  /* Premium Dark Theme (Zinc Palette) */
+  --background: #09090b;
+  /* Zinc 950 */
+  --surface: #18181b;
+  /* Zinc 900 */
+  --surface-highlight: #27272a;
+  /* Zinc 800 */
 
-  --primary: #00F0FF;
-  /* Neon Cyan */
-  --secondary: #7000FF;
-  /* Deep Neon Purple */
-  --accent: #FF0055;
-  /* Hot Pink */
+  --foreground: #fafafa;
+  /* Zinc 50 */
+  --muted: #a1a1aa;
+  /* Zinc 400 */
 
-  --glass-border: rgba(255, 255, 255, 0.08);
-  --glass-surface: rgba(255, 255, 255, 0.03);
+  --primary: #ffffff;
+  /* White - Clean Professional Look */
+  --accent: #6366f1;
+  /* Indigo 500 - Subtle SaaS Accent */
+
+  --border: rgba(255, 255, 255, 0.08);
+  --border-hover: rgba(255, 255, 255, 0.15);
+
+  /* Glassmorphism - Refined */
+  --glass-bg: rgba(9, 9, 11, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.05);
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-surface: var(--surface);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+
   --font-sans: var(--font-inter);
   --font-display: var(--font-outfit);
 }
@@ -34,95 +50,102 @@ body {
 
 /* --- 3. UTILITIES & EFFECTS --- */
 
-/* Glassmorphism Card */
+/* Professional Card */
 .glass-panel {
-  background: var(--glass-surface);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid var(--glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+  background: var(--surface);
+  /* Fallback */
+  background: linear-gradient(180deg, rgba(24, 24, 27, 0.8) 0%, rgba(9, 9, 11, 0.8) 100%);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-/* Neon Glow Text */
-.text-glow {
-  text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
-}
-
-/* Cosmic Gradient Text */
+/* Subtle Gradient Text */
 .text-gradient {
-  background: linear-gradient(135deg, #FFF 0%, #00F0FF 100%);
+  background: linear-gradient(to right, #ffffff, #a1a1aa);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #222;
-  border-radius: 4px;
+  background: #3f3f46;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #333;
+  background: #52525b;
 }
 
-/* --- 4. ANIMATIONS --- */
-@keyframes blob {
+/* --- 4. ANIMATIONS (Professional & Fluid) --- */
+
+/* Smooth Fade In */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Scale Up Modal */
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.2s ease-out forwards;
+}
+
+/* Gentle Pulse for Recording */
+@keyframes pulse-ring {
   0% {
-    transform: translate(0px, 0px) scale(1);
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.7);
   }
 
-  33% {
-    transform: translate(30px, -50px) scale(1.2);
-  }
-
-  66% {
-    transform: translate(-20px, 20px) scale(0.8);
+  70% {
+    transform: scale(1);
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
   }
 
   100% {
-    transform: translate(0px, 0px) scale(1);
+    transform: scale(0.95);
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
   }
 }
 
-.animate-blob {
-  animation: blob 10s infinite alternate;
+.animate-pulse-ring {
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-@keyframes float {
-  0% {
-    transform: translateY(0px);
-  }
-
-  50% {
-    transform: translateY(-10px);
-  }
-
-  100% {
-    transform: translateY(0px);
-  }
-}
-
-.animate-float {
-  animation: float 6s ease-in-out infinite;
-}
-
-@keyframes scanning {
+/* Scan Line - Refined */
+@keyframes scan {
   0% {
     top: 0%;
     opacity: 0;
@@ -146,8 +169,8 @@ body {
   position: absolute;
   left: 0;
   width: 100%;
-  height: 2px;
-  background: var(--primary);
-  box-shadow: 0 0 10px var(--primary);
-  animation: scanning 2s linear infinite;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--foreground), transparent);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+  animation: scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }

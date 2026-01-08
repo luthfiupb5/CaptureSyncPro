@@ -5,9 +5,13 @@ import { db } from '@/lib/db';
 export async function POST(req: Request) {
     try {
         const { username, password } = await req.json();
+        console.log('[LOGIN] Attempting login for username:', username);
+
         const user = await db.getUser(username);
+        console.log('[LOGIN] User found:', !!user);
 
         if (!user || user.password !== password) {
+            console.log('[LOGIN] Invalid credentials');
             return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
         }
 
@@ -26,8 +30,13 @@ export async function POST(req: Request) {
             maxAge: 60 * 60 * 24 // 1 day
         });
 
+        console.log('[LOGIN] Login successful for user:', username);
         return response;
     } catch (e) {
-        return NextResponse.json({ error: "Server error" }, { status: 500 });
+        console.error('[LOGIN] Error:', e);
+        return NextResponse.json({
+            error: "Server error",
+            details: process.env.NODE_ENV === 'development' ? String(e) : undefined
+        }, { status: 500 });
     }
 }

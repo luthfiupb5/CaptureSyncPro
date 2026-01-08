@@ -162,12 +162,12 @@ function EventPage() {
 
       <main className="flex flex-col items-center justify-center min-h-screen px-4">
 
-        {/* --- LANDING --- */}
+        {/* --- LANDING / INTRO --- */}
         {step === "LANDING" && (
           <div className="w-full max-w-lg mx-auto text-center space-y-12 animate-fade-in relative z-10">
 
-            {/* Event Badge */}
-            {eventData && (
+            {/* Event Badge (Only if Event ID exists) */}
+            {eventId && eventData && (
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-highlight)] border border-[var(--border)] animate-fade-in">
                 <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
                 <span className="text-xs font-mono uppercase tracking-widest text-[var(--muted)]">{eventData.name}</span>
@@ -177,20 +177,48 @@ function EventPage() {
             {/* Hero Type */}
             <div className="space-y-6">
               <h1 className="text-5xl md:text-7xl font-display font-medium tracking-tight text-gradient">
-                Unleash Your<br />Moments.
+                {eventId ? "Unleash Your\nMoments." : "CaptureSync\nPro."}
               </h1>
               <p className="text-[var(--muted)] text-lg max-w-sm mx-auto leading-relaxed">
-                Secure, instant face authentication to retrieve your event memories.
+                {eventId
+                  ? "Secure, instant face authentication to retrieve your event memories."
+                  : "The premium AI-powered photo distribution platform for exclusive events."
+                }
               </p>
             </div>
 
             {/* Action */}
             <div className="space-y-4">
               {!eventId ? (
-                <div className="p-4 rounded-xl bg-[var(--surface)] border border-red-900/50 text-red-400 text-sm font-mono">
-                  Access Denied: Missing Event Key
+                // INTRO: ROLE SELECTION
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <button
+                    onClick={() => window.location.href = '/admin'}
+                    className="group flex flex-col items-center justify-center p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <Lock size={20} />
+                    </div>
+                    <h3 className="font-display font-bold text-white mb-1">Admin Console</h3>
+                    <p className="text-xs text-[var(--muted)]">Manage events & photos</p>
+                  </button>
+
+                  <button
+                    onClick={() => {
+                      const id = prompt("Please enter the Event ID provided by your host:");
+                      if (id) window.location.href = `/?eventId=${id}`;
+                    }}
+                    className="group flex flex-col items-center justify-center p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-green-500/50 hover:bg-green-500/5 transition-all"
+                  >
+                    <div className="w-12 h-12 rounded-full bg-green-500/10 text-green-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                      <ScanFace size={20} />
+                    </div>
+                    <h3 className="font-display font-bold text-white mb-1">Event Guest</h3>
+                    <p className="text-xs text-[var(--muted)]">Find my photos</p>
+                  </button>
                 </div>
               ) : (
+                // EVENT: START SCAN
                 <>
                   <button
                     onClick={() => setShowInputOptions(true)}

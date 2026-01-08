@@ -11,6 +11,7 @@ import {
     LayoutGrid, List
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
+import { supabase } from "@/lib/supabase";
 
 // Types
 interface Event {
@@ -193,13 +194,35 @@ export default function AdminDashboard() {
                     }
                 }
 
-                // 3. Upload
-                const formData = new FormData();
-                formData.append('file', blobToUpload);
-                formData.append('eventId', selectedEvent.id);
-                formData.append('vectors', JSON.stringify(vectors));
+                // 3. Upload DIRECTLY to Supabase (Bypass Vercel 4.5MB limit)
+                const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
+                const filePath = `${selectedEvent.id}/${filename}`;
 
-                await fetch('/api/upload', { method: 'POST', body: formData });
+                const { data: uploadData, error: uploadError } = await supabase.storage
+                    .from('photos')
+                    .upload(filePath, blobToUpload, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+
+                if (uploadError) throw uploadError;
+
+                // Get Public URL
+                const { data: { publicUrl } } = supabase.storage
+                    .from('photos')
+                    .getPublicUrl(filePath);
+
+                // 4. Register Metadata via API
+                await fetch('/api/upload', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        publicUrl,
+                        eventId: selectedEvent.id,
+                        vectors
+                    })
+                });
+
                 URL.revokeObjectURL(imgUrl);
 
             } catch (e) {

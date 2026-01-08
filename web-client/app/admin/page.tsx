@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
 import { supabase } from "@/lib/supabase";
+import imageCompression from 'browser-image-compression';
 
 // Types
 interface Event {
@@ -193,6 +194,16 @@ export default function AdminDashboard() {
                         }
                     }
                 }
+
+                // 2.5 Compression (Optimization)
+                console.log(`Original size: ${blobToUpload.size / 1024 / 1024} MB`);
+                const compressedFile = await imageCompression(blobToUpload, {
+                    maxSizeMB: 1.5,
+                    maxWidthOrHeight: 2500,
+                    useWebWorker: true
+                });
+                console.log(`Compressed size: ${compressedFile.size / 1024 / 1024} MB`);
+                blobToUpload = compressedFile;
 
                 // 3. Upload DIRECTLY to Supabase (Bypass Vercel 4.5MB limit)
                 const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;

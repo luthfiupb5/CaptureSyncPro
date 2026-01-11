@@ -1,0 +1,14 @@
+{
+  "users": [
+    {
+      "id": "20ed7372-9128-4591-bd3c-4c86491e0231",
+      "username": "luthfi",
+      "password": "Luthfi@2005",
+      "role": "super_admin",
+      "createdAt": "2026-01-11T10:20:54.840Z"
+    }
+  ],
+  "events": [],
+  "photos": [],
+  "vectors": []
+}

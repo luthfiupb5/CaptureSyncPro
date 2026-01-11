@@ -6,12 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint",
-    "postinstall": "prisma generate"
+    "lint": "eslint"
   },
   "dependencies": {
-    "@prisma/client": "^6.19.1",
-    "@supabase/supabase-js": "^2.90.0",
     "browser-image-compression": "^2.0.2",
     "face-api.js": "^0.22.2",
     "lucide-react": "^0.562.0",
@@ -27,7 +24,6 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.1.1",
-    "prisma": "^6.19.1",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

@@ -2,7 +2,7 @@
 "use client";
 
 import { useState } from "react";
-import { Github, Linkedin, Code, X, Phone } from "lucide-react";
+import { Github, Linkedin, Code, X, Phone, Mail } from "lucide-react";
 
 export default function DeveloperCard() {
     const [isOpen, setIsOpen] = useState(true);
@@ -11,27 +11,27 @@ export default function DeveloperCard() {
         return (
             <button
                 onClick={() => setIsOpen(true)}
-                className="fixed bottom-4 left-4 z-50 p-3 bg-white/10 backdrop-blur-md border border-white/20 rounded-full text-white hover:bg-white/20 transition-all shadow-lg animate-fade-in"
+                className="fixed bottom-6 right-6 z-[100] p-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-full text-white hover:bg-white/10 hover:scale-110 transition-all shadow-[0_0_20px_rgba(255,255,255,0.05)] animate-fade-in group"
                 title="Meet the Developer"
             >
-                <Code size={20} />
+                <Code size={24} className="group-hover:text-indigo-400 transition-colors" />
             </button>
         );
     }
 
     return (
-        <div className="fixed bottom-4 left-4 z-50 animate-slide-in-up">
-            <div className="bg-gray-900/80 backdrop-blur-xl border border-white/10 p-4 rounded-2xl shadow-2xl w-72 relative overflow-hidden group">
+        <div className="fixed bottom-6 right-6 z-[100] animate-slide-in-up">
+            <div className="glass-panel p-5 rounded-2xl w-80 relative overflow-hidden group border-white/10 shadow-2xl shadow-black/50">
                 {/* Close Button */}
                 <button
                     onClick={() => setIsOpen(false)}
-                    className="absolute top-2 right-2 text-gray-500 hover:text-white transition-colors"
+                    className="absolute top-3 right-3 text-white/40 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1 rounded-full"
                 >
                     <X size={14} />
                 </button>
 
-                <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/10 shadow-lg">
+                <div className="flex items-center gap-4 mb-4">
+                    <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-white/10 shadow-lg ring-2 ring-transparent group-hover:ring-indigo-500/30 transition-all cursor-pointer hover:scale-105">
                         <img
                             src="/assets/Founder_dp.jpg"
                             alt="Luthfi Bassam"
@@ -39,39 +39,45 @@ export default function DeveloperCard() {
                         />
                     </div>
                     <div>
-                        <h3 className="text-sm font-bold text-white leading-tight">Luthfi Bassam U P</h3>
-                        <div className="flex items-center gap-1 text-[11px] text-gray-400 font-mono mt-0.5">
-                            <Phone size={10} /> +91 7356556087
+                        <p className="text-[10px] text-indigo-400 font-bold uppercase tracking-widest mb-0.5">Meet the Developer</p>
+                        <h3 className="text-lg font-display font-bold text-white leading-tight">Luthfi Bassam U P</h3>
+                        <div className="flex flex-col gap-1 mt-2">
+                            <div className="flex items-center gap-2 text-[11px] text-[var(--muted)] font-mono">
+                                <Phone size={12} className="text-white/40" /> +91 7356556087
+                            </div>
+                            <div className="flex items-center gap-2 text-[11px] text-[var(--muted)] font-mono">
+                                <Mail size={12} className="text-white/40" /> connect.luthfi05@gmail.com
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <p className="text-xs text-gray-400 mb-4 leading-relaxed">
-                    Built with Next.js, Face-API.js & Passion.
-                </p>
+                <div className="space-y-3">
 
-                <div className="flex gap-2">
-                    <a
-                        href="https://github.com/luthfiupb5"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/20 rounded-lg py-1.5 flex items-center justify-center gap-2 text-xs text-gray-300 transition-all font-medium"
-                    >
-                        <Github size={12} /> GitHub
-                    </a>
-                    <a
-                        href="https://www.linkedin.com/in/luthfibassamup/"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex-1 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/20 hover:border-blue-500/50 rounded-lg py-1.5 flex items-center justify-center gap-2 text-xs text-blue-400 transition-all font-medium"
-                    >
-                        <Linkedin size={12} /> Connect
-                    </a>
+
+                    <div className="flex gap-3 pt-1">
+                        <a
+                            href="https://github.com/luthfiupb5"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-white/5 hover:bg-black/40 border border-white/5 hover:border-white/20 rounded-xl py-2 flex items-center justify-center gap-2 text-xs text-white/80 hover:text-white transition-all font-medium group/btn"
+                        >
+                            <Github size={14} className="group-hover/btn:scale-110 transition-transform" /> GitHub
+                        </a>
+                        <a
+                            href="https://www.linkedin.com/in/luthfibassamup/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex-1 bg-gradient-to-r from-blue-600/20 to-indigo-600/20 hover:from-blue-600/30 hover:to-indigo-600/30 border border-blue-500/20 hover:border-blue-500/40 rounded-xl py-2 flex items-center justify-center gap-2 text-xs text-blue-200 hover:text-white transition-all font-medium group/btn"
+                        >
+                            <Linkedin size={14} className="group-hover/btn:scale-110 transition-transform" /> Connect
+                        </a>
+                    </div>
                 </div>
 
                 {/* Decorative Glow */}
-                <div className="absolute -top-10 -left-10 w-20 h-20 bg-blue-500/20 rounded-full blur-2xl pointer-events-none" />
-                <div className="absolute -bottom-10 -right-10 w-20 h-20 bg-purple-500/20 rounded-full blur-2xl pointer-events-none" />
+                <div className="absolute -top-12 -left-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-colors duration-500" />
+                <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-violet-500/20 transition-colors duration-500" />
             </div>
         </div>
     );

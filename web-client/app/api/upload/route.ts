@@ -1,27 +1,41 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/lib/db';
+import { writeFile, mkdir } from 'fs/promises';
+import path from 'path';
 
 export async function POST(req: Request) {
-    console.log("[API] Registering photo metadata...");
+    console.log("[API] Processing local upload...");
     try {
-        const body = await req.json();
-        const { publicUrl, eventId, vectors } = body;
+        const formData = await req.formData();
+        const file = formData.get('file') as File;
+        const eventId = formData.get('eventId') as string;
+        const vectorsStr = formData.get('vectors') as string;
 
-        if (!publicUrl || !eventId || !vectors) {
-            console.error("[API] Missing fields", { publicUrl, eventId, vectors: !!vectors });
+        if (!file || !eventId || !vectorsStr) {
             return NextResponse.json({ error: "Missing fields" }, { status: 400 });
         }
 
-        console.log(`[API] Registering photo: ${publicUrl}`);
+        const buffer = Buffer.from(await file.arrayBuffer());
+        const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
 
-        // Save to DB (Prisma)
-        const photo = await db.addPhotoWithVectors(publicUrl, eventId, vectors);
-        console.log("[API] Database Registration Success:", photo.id);
+        // Ensure directory exists
+        const uploadDir = path.join(process.cwd(), 'public', 'uploads', eventId);
+        await mkdir(uploadDir, { recursive: true });
 
+        // Write file
+        const relativePath = `/uploads/${eventId}/${filename}`;
+        const absolutePath = path.join(uploadDir, filename);
+        await writeFile(absolutePath, buffer);
+
+        // Save to DB
+        const vectors = JSON.parse(vectorsStr);
+        const photo = await db.addPhotoWithVectors(relativePath, eventId, vectors);
+
+        console.log(`[API] Saved photo locally: ${relativePath}`);
         return NextResponse.json({ success: true, photo });
 
     } catch (e) {
-        console.error("[API] Registration Error:", e);
-        return NextResponse.json({ error: "Internal Server Error: " + String(e) }, { status: 500 });
+        console.error("[API] Upload Error:", e);
+        return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
     }
 }

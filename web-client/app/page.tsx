@@ -147,60 +147,84 @@ function EventPage() {
   return (
     <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans antialiased overflow-hidden selection:bg-indigo-500/30">
 
-      {/* Navbar */}
-      <nav className="fixed top-0 w-full z-40 px-6 py-6 flex justify-between items-center mix-blend-difference text-white">
-        <div className="font-bold text-xl tracking-tight flex items-center gap-2">
-          <div className="w-6 h-6 rounded bg-white text-black flex items-center justify-center text-xs">C</div>
-          CaptureSync
+      {/* Navbar - Floating Glass */}
+      <nav className="fixed top-6 left-0 right-0 max-w-7xl mx-auto px-6 z-40 flex justify-between items-center mix-blend-difference text-white pointer-events-none">
+        <div
+          className="flex items-center gap-3 pointer-events-auto cursor-pointer group"
+          onClick={() => {
+            setStep("LANDING");
+            setMatches([]);
+            setSelectedPhoto(null);
+          }}
+        >
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-[0_0_20px_rgba(99,102,241,0.3)] group-hover:scale-105 transition-transform">
+            <Aperture size={20} />
+          </div>
+          <div>
+            <h1 className="font-display font-bold text-xl tracking-tight group-hover:text-indigo-300 transition-colors">CaptureSync</h1>
+            <p className="text-[10px] text-[var(--muted)] font-mono uppercase tracking-widest hidden sm:block">AI Neural Gallery</p>
+          </div>
         </div>
+
         {!loading && step !== "LANDING" && (
-          <button onClick={() => setStep("LANDING")} className="p-2 rounded-full hover:bg-white/10 transition-colors">
+          <button onClick={() => setStep("LANDING")} className="pointer-events-auto w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-md flex items-center justify-center transition-all border border-white/10 hover:scale-110">
             <X size={20} />
           </button>
         )}
       </nav>
 
-      <main className="flex flex-col items-center justify-center min-h-screen px-4">
+      <main className="relative flex flex-col items-center justify-center min-h-screen px-4 py-20">
+
+        {/* Background Ambient Glow */}
+        <div className="fixed inset-0 pointer-events-none overflow-hidden">
+          <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-[100px]"></div>
+        </div>
 
         {/* --- LANDING / INTRO --- */}
         {step === "LANDING" && (
-          <div className="w-full max-w-lg mx-auto text-center space-y-12 animate-fade-in relative z-10">
+          <div className="w-full max-w-2xl mx-auto text-center space-y-16 animate-fade-in relative z-10">
 
             {/* Event Badge (Only if Event ID exists) */}
             {eventId && eventData && (
-              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[var(--surface-highlight)] border border-[var(--border)] animate-fade-in">
-                <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                <span className="text-xs font-mono uppercase tracking-widest text-[var(--muted)]">{eventData.name}</span>
+              <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass-panel animate-fade-in hover:border-indigo-500/30 transition-colors cursor-default">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
+                </span>
+                <span className="text-xs font-mono uppercase tracking-widest text-[var(--foreground)]">{eventData.name}</span>
               </div>
             )}
 
             {/* Hero Type */}
-            <div className="space-y-6">
-              <h1 className="text-5xl md:text-7xl font-display font-medium tracking-tight text-gradient">
-                {eventId ? "Unleash Your\nMoments." : "CaptureSync\nPro."}
+            <div className="space-y-8">
+              <h1 className="text-6xl md:text-8xl font-display font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 drop-shadow-sm">
+                {eventId ? "Your Moments.\nInstantly." : "CaptureSync\nPro."}
               </h1>
-              <p className="text-[var(--muted)] text-lg max-w-sm mx-auto leading-relaxed">
+              <p className="text-[var(--muted)] text-lg md:text-xl max-w-lg mx-auto leading-relaxed font-light">
                 {eventId
-                  ? "Secure, instant face authentication to retrieve your event memories."
+                  ? "Advanced facial recognition to securely retrieve your event memories in milliseconds."
                   : "The premium AI-powered photo distribution platform for exclusive events."
                 }
               </p>
             </div>
 
             {/* Action */}
-            <div className="space-y-4">
+            <div className="w-full max-w-md mx-auto space-y-6">
               {!eventId ? (
-                // INTRO: ROLE SELECTION
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                // INTRO: ROLE SELECTION - Glass Cards
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <button
                     onClick={() => window.location.href = '/admin'}
-                    className="group flex flex-col items-center justify-center p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all"
+                    className="group glass-panel p-8 rounded-2xl flex flex-col items-center justify-center gap-4 hover:-translate-y-1 transition-transform duration-300"
                   >
-                    <div className="w-12 h-12 rounded-full bg-indigo-500/10 text-indigo-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <Lock size={20} />
+                    <div className="w-14 h-14 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-indigo-500 group-hover:text-white transition-all duration-300 shadow-[0_0_20px_rgba(99,102,241,0)] group-hover:shadow-[0_0_20px_rgba(99,102,241,0.5)]">
+                      <Lock size={24} />
                     </div>
-                    <h3 className="font-display font-bold text-white mb-1">Admin Console</h3>
-                    <p className="text-xs text-[var(--muted)]">Manage events & photos</p>
+                    <div>
+                      <h3 className="font-display font-bold text-white text-lg">Admin View</h3>
+                      <p className="text-xs text-[var(--muted)] mt-1">Manage Galleries</p>
+                    </div>
                   </button>
 
                   <button
@@ -208,26 +232,34 @@ function EventPage() {
                       const id = prompt("Please enter the Event ID provided by your host:");
                       if (id) window.location.href = `/?eventId=${id}`;
                     }}
-                    className="group flex flex-col items-center justify-center p-8 rounded-2xl bg-[var(--surface)] border border-[var(--border)] hover:border-green-500/50 hover:bg-green-500/5 transition-all"
+                    className="group glass-panel p-8 rounded-2xl flex flex-col items-center justify-center gap-4 hover:-translate-y-1 transition-transform duration-300 text-left"
                   >
-                    <div className="w-12 h-12 rounded-full bg-green-500/10 text-green-400 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                      <ScanFace size={20} />
+                    <div className="w-14 h-14 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center group-hover:scale-110 group-hover:bg-emerald-500 group-hover:text-white transition-all duration-300 shadow-[0_0_20px_rgba(16,185,129,0)] group-hover:shadow-[0_0_20px_rgba(16,185,129,0.5)]">
+                      <ScanFace size={24} />
                     </div>
-                    <h3 className="font-display font-bold text-white mb-1">Event Guest</h3>
-                    <p className="text-xs text-[var(--muted)]">Find my photos</p>
+                    <div>
+                      <h3 className="font-display font-bold text-white text-lg">Guest Access</h3>
+                      <p className="text-xs text-[var(--muted)] mt-1">Find Photos</p>
+                    </div>
                   </button>
                 </div>
               ) : (
-                // EVENT: START SCAN
+                // EVENT: START SCAN - Premium Pill Button
                 <>
                   <button
                     onClick={() => setShowInputOptions(true)}
-                    className="group relative w-full h-16 bg-white text-black rounded-full font-medium text-lg flex items-center justify-center gap-3 hover:scale-[1.02] transition-transform shadow-[0_0_40px_rgba(255,255,255,0.1)] hover:shadow-[0_0_60px_rgba(255,255,255,0.2)]"
+                    className="group relative w-full h-20 rounded-full overflow-hidden transition-all hover:scale-[1.02] shadow-[0_0_40px_rgba(99,102,241,0.2)] hover:shadow-[0_0_60px_rgba(99,102,241,0.4)]"
                   >
-                    <ScanFace size={24} /> Start Identification
+                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-600 to-violet-600"></div>
+                    <div className="absolute inset-0 bg-[url('/noise.png')] opacity-20 mix-blend-overlay"></div>
+                    <div className="relative flex items-center justify-center gap-4 text-white font-bold text-lg tracking-wide">
+                      <ScanFace size={24} />
+                      START IDENTIFICATION
+                    </div>
                   </button>
-                  <button onClick={fetchGlobalGallery} className="text-sm text-[var(--muted)] hover:text-white transition-colors flex items-center justify-center gap-2 w-full py-2">
-                    Browse Public Gallery <ChevronRight size={14} />
+
+                  <button onClick={fetchGlobalGallery} className="text-xs font-mono uppercase tracking-widest text-[var(--muted)] hover:text-white transition-colors flex items-center justify-center gap-2 w-full py-4 opacity-70 hover:opacity-100">
+                    Browse Public Gallery <ChevronRight size={12} />
                   </button>
                   <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" accept="image/*" />
                 </>
@@ -269,27 +301,30 @@ function EventPage() {
 
         {/* --- RESULTS GRID --- */}
         {(step === "RESULTS" || step === "ALL_PHOTOS") && (
-          <div className="w-full max-w-7xl pt-24 pb-12 animate-fade-in px-4 md:px-0">
-            <header className="mb-12 flex items-end justify-between border-b border-[var(--border)] pb-8">
+          <div className="w-full max-w-7xl pt-12 pb-24 animate-fade-in relative z-10">
+            <header className="mb-12 flex items-end justify-between border-b border-white/10 pb-8 mx-6">
               <div>
-                <h2 className="text-4xl font-display font-medium text-white mb-2">
+                <h2 className="text-4xl md:text-5xl font-display font-bold text-white mb-2">
                   {step === "RESULTS" ? "Personal Gallery" : "Public Gallery"}
                 </h2>
-                <p className="text-[var(--muted)]">
+                <p className="text-[var(--muted)] font-light">
                   {step === "RESULTS" ? `Found ${matches.length} matches verified by AI.` : "Browsing all event captures."}
+                  {step === "RESULTS" && matches.length === 0 && " No matches found."}
                 </p>
               </div>
             </header>
 
-            <div className="columns-1 md:columns-3 lg:columns-4 gap-4 space-y-4">
+            <div className="px-6 columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-6 space-y-6">
               {(step === "RESULTS" ? matches : allPhotos.map(p => p.url)).map((src, i) => (
                 <div
                   key={i}
                   onClick={() => setSelectedPhoto(src)}
-                  className="break-inside-avoid relative rounded-lg overflow-hidden group cursor-zoom-in bg-zinc-900"
+                  className="break-inside-avoid relative rounded-xl overflow-hidden group cursor-zoom-in bg-[var(--surface-highlight)] border border-white/5 hover:border-white/20 transition-all duration-500 hover:shadow-2xl"
                 >
-                  <img src={src} alt="" className="w-full h-auto object-cover opacity-90 group-hover:opacity-100 transition-opacity" loading="lazy" />
-                  <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors"></div>
+                  <img src={src} alt="" className="w-full h-auto object-cover opacity-80 group-hover:opacity-100 transition-opacity duration-500" loading="lazy" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4">
+                    <p className="text-xs font-mono text-white/70 uppercase tracking-widest">View Full</p>
+                  </div>
                 </div>
               ))}
             </div>
@@ -297,14 +332,15 @@ function EventPage() {
         )}
 
         {/* --- LOADING OVERLAY --- */}
+        {/* --- LOADING OVERLAY --- */}
         {loading && (
-          <div className="fixed inset-0 z-50 bg-[#09090b]/90 backdrop-blur-xl flex flex-col items-center justify-center">
+          <div className="fixed inset-0 z-50 bg-[#000000]/80 backdrop-blur-2xl flex flex-col items-center justify-center animate-fade-in">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full border border-[var(--border)] animate-spin opacity-50"></div>
-              <div className="absolute inset-0 w-24 h-24 rounded-full border-t border-white animate-spin"></div>
-              <Lock className="absolute inset-0 m-auto text-white w-6 h-6" />
+              <div className="w-24 h-24 rounded-full border-2 border-white/10 animate-spin"></div>
+              <div className="absolute inset-0 w-24 h-24 rounded-full border-t-2 border-indigo-500 animate-spin"></div>
+              <Lock className="absolute inset-0 m-auto text-indigo-400 w-6 h-6 animate-pulse" />
             </div>
-            <p className="mt-8 text-sm font-mono uppercase tracking-widest text-[var(--muted)] animate-pulse">{status}</p>
+            <p className="mt-8 text-sm font-mono uppercase tracking-[0.2em] text-indigo-400 animate-pulse">{status}</p>
           </div>
         )}
 
@@ -334,9 +370,31 @@ function EventPage() {
           <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedPhoto(null)}>
             <img src={selectedPhoto} className="max-w-full max-h-[85vh] rounded shadow-2xl object-contain" onClick={e => e.stopPropagation()} />
             <div className="absolute bottom-8 flex gap-4">
-              <a href={selectedPhoto} download className="px-6 py-3 bg-white text-black rounded-full font-medium hover:scale-105 transition-transform flex items-center gap-2" onClick={e => e.stopPropagation()}>
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  try {
+                    const response = await fetch(selectedPhoto);
+                    const blob = await response.blob();
+                    const urlFilename = selectedPhoto.split('/').pop() || 'photo.jpg';
+                    const filename = urlFilename.includes('.') ? urlFilename : `${urlFilename}.jpg`;
+
+                    const link = document.createElement('a');
+                    link.href = window.URL.createObjectURL(blob);
+                    link.download = filename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(link.href);
+                  } catch (err) {
+                    // Fallback
+                    window.open(selectedPhoto, '_blank');
+                  }
+                }}
+                className="px-6 py-3 bg-white text-black rounded-full font-medium hover:scale-105 transition-transform flex items-center gap-2"
+              >
                 <Download size={18} /> Download Original
-              </a>
+              </button>
             </div>
             <button className="absolute top-6 right-6 p-4 text-white/50 hover:text-white transition-colors"><X size={24} /></button>
           </div>

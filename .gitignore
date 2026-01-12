@@ -32,3 +32,4 @@ web-client/node_modules/
 web-client/.next/
 
 web-client/public/uploads/
+!.vscode/settings.json

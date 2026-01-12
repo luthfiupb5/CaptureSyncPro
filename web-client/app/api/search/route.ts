@@ -1,12 +1,10 @@
 import { NextResponse } from 'next/server';
 import { db, Photo } from '@/lib/db';
 
-
-
 export async function POST(req: Request) {
     try {
         const body = await req.json();
-        const { eventId, vector } = body; // vector is 128-float array
+        const { eventId, vector } = body;
 
         if (!eventId || !vector) {
             return NextResponse.json({ error: "Missing eventId or vector" }, { status: 400 });

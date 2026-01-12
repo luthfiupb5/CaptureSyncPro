@@ -31,7 +31,6 @@ function EventPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
-  // Initialization
   useEffect(() => {
     setStatus("Initializing Neural Engine...");
     FaceMatcher.getInstance().loadModels().then(() => setStatus("System Ready"));
@@ -65,12 +64,10 @@ function EventPage() {
     setStatus("Encrypting Biometrics...");
 
     try {
-      // 1. Detect Face
       let img;
       if (typeof imageSource === 'string') {
         img = await faceapi.fetchImage(imageSource);
       } else {
-        // Video
         img = imageSource;
       }
 
@@ -85,13 +82,11 @@ function EventPage() {
 
       const vector = Array.from(detection.descriptor);
 
-      // 2. Stop Camera if active
       if (videoRef.current && typeof imageSource !== 'string') {
         const stream = videoRef.current.srcObject as MediaStream;
         stream?.getTracks().forEach(t => t.stop());
       }
 
-      // 3. Match
       setStatus("Matching Identity...");
       const res = await fetch('/api/search', {
         method: 'POST',
@@ -143,11 +138,9 @@ function EventPage() {
     finally { setLoading(false); }
   };
 
-  // --- RENDER ---
   return (
     <div className="relative min-h-screen bg-[var(--background)] text-[var(--foreground)] font-sans antialiased overflow-hidden selection:bg-indigo-500/30">
 
-      {/* Navbar - Floating Glass */}
       <nav className="fixed top-6 left-0 right-0 max-w-7xl mx-auto px-6 z-40 flex justify-between items-center mix-blend-difference text-white pointer-events-none">
         <div
           className="flex items-center gap-3 pointer-events-auto cursor-pointer group"
@@ -175,17 +168,14 @@ function EventPage() {
 
       <main className="relative flex flex-col items-center justify-center min-h-screen px-4 py-20">
 
-        {/* Background Ambient Glow */}
         <div className="fixed inset-0 pointer-events-none overflow-hidden">
           <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[120px]"></div>
           <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-violet-500/10 rounded-full blur-[100px]"></div>
         </div>
 
-        {/* --- LANDING / INTRO --- */}
         {step === "LANDING" && (
           <div className="w-full max-w-2xl mx-auto text-center space-y-16 animate-fade-in relative z-10">
 
-            {/* Event Badge (Only if Event ID exists) */}
             {eventId && eventData && (
               <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full glass-panel animate-fade-in hover:border-indigo-500/30 transition-colors cursor-default">
                 <span className="relative flex h-2 w-2">
@@ -196,7 +186,6 @@ function EventPage() {
               </div>
             )}
 
-            {/* Hero Type */}
             <div className="space-y-8">
               <h1 className="text-6xl md:text-8xl font-display font-bold tracking-tighter text-transparent bg-clip-text bg-gradient-to-b from-white to-white/40 drop-shadow-sm">
                 {eventId ? "Your Moments.\nInstantly." : "CaptureSync\nPro."}
@@ -209,10 +198,8 @@ function EventPage() {
               </p>
             </div>
 
-            {/* Action */}
             <div className="w-full max-w-md mx-auto space-y-6">
               {!eventId ? (
-                // INTRO: ROLE SELECTION - Glass Cards
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <button
                     onClick={() => window.location.href = '/admin'}
@@ -244,7 +231,6 @@ function EventPage() {
                   </button>
                 </div>
               ) : (
-                // EVENT: START SCAN - Premium Pill Button
                 <>
                   <button
                     onClick={() => setShowInputOptions(true)}
@@ -268,20 +254,15 @@ function EventPage() {
           </div>
         )}
 
-        {/* --- CAMERA SCANNING --- */}
         {step === "CAMERA" && (
           <div className="fixed inset-0 z-20 bg-black flex flex-col pt-24 pb-12 items-center justify-between">
 
-            {/* Scan Frame */}
             <div className="relative w-full max-w-md aspect-[3/4] mx-auto px-6">
               <div className="relative w-full h-full rounded-[3rem] overflow-hidden border border-[var(--border)] shadow-2xl bg-zinc-900">
                 <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover transform scale-x-[-1]" />
 
-                {/* UI Overlay */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center p-8 pointer-events-none">
-                  {/* Face Guide */}
                   <div className="w-64 h-80 rounded-[45%] border-2 border-white/20 relative overflow-hidden">
-                    {/* Scan Line */}
                     <div className="absolute top-0 left-0 w-full h-1 bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,1)] animate-scan"></div>
                   </div>
                   <p className="mt-8 text-white/50 font-mono text-xs uppercase tracking-widest bg-black/50 px-3 py-1 rounded backdrop-blur-md">Position Face within Frame</p>
@@ -289,7 +270,6 @@ function EventPage() {
               </div>
             </div>
 
-            {/* Control */}
             <button
               onClick={handleCapture}
               className="w-20 h-20 rounded-full bg-white flex items-center justify-center animate-pulse-ring active:scale-90 transition-transform"
@@ -299,7 +279,6 @@ function EventPage() {
           </div>
         )}
 
-        {/* --- RESULTS GRID --- */}
         {(step === "RESULTS" || step === "ALL_PHOTOS") && (
           <div className="w-full max-w-7xl pt-12 pb-24 animate-fade-in relative z-10">
             <header className="mb-12 flex items-end justify-between border-b border-white/10 pb-8 mx-6">
@@ -331,8 +310,6 @@ function EventPage() {
           </div>
         )}
 
-        {/* --- LOADING OVERLAY --- */}
-        {/* --- LOADING OVERLAY --- */}
         {loading && (
           <div className="fixed inset-0 z-50 bg-[#000000]/80 backdrop-blur-2xl flex flex-col items-center justify-center animate-fade-in">
             <div className="relative">
@@ -344,7 +321,6 @@ function EventPage() {
           </div>
         )}
 
-        {/* --- INPUT MODAL --- */}
         {showInputOptions && (
           <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-end sm:items-center justify-center p-4 animate-fade-in" onClick={() => setShowInputOptions(false)}>
             <div className="bg-[var(--surface)] border border-[var(--border)] w-full max-w-sm rounded-3xl p-6 animate-scale-in space-y-3 shadow-2xl" onClick={e => e.stopPropagation()}>
@@ -365,7 +341,6 @@ function EventPage() {
           </div>
         )}
 
-        {/* --- LIGHTBOX --- */}
         {selectedPhoto && (
           <div className="fixed inset-0 z-[60] bg-black/95 backdrop-blur-md flex items-center justify-center p-4 animate-fade-in" onClick={() => setSelectedPhoto(null)}>
             <img src={selectedPhoto} className="max-w-full max-h-[85vh] rounded shadow-2xl object-contain" onClick={e => e.stopPropagation()} />
@@ -387,7 +362,6 @@ function EventPage() {
                     document.body.removeChild(link);
                     window.URL.revokeObjectURL(link.href);
                   } catch (err) {
-                    // Fallback
                     window.open(selectedPhoto, '_blank');
                   }
                 }}

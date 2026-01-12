@@ -22,7 +22,6 @@ export default function DeveloperCard() {
     return (
         <div className="fixed bottom-6 right-6 z-[100] animate-slide-in-up">
             <div className="glass-panel p-5 rounded-2xl w-80 relative overflow-hidden group border-white/10 shadow-2xl shadow-black/50">
-                {/* Close Button */}
                 <button
                     onClick={() => setIsOpen(false)}
                     className="absolute top-3 right-3 text-white/40 hover:text-white transition-colors bg-white/5 hover:bg-white/10 p-1 rounded-full"
@@ -75,7 +74,6 @@ export default function DeveloperCard() {
                     </div>
                 </div>
 
-                {/* Decorative Glow */}
                 <div className="absolute -top-12 -left-12 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-indigo-500/20 transition-colors duration-500" />
                 <div className="absolute -bottom-12 -right-12 w-32 h-32 bg-violet-500/10 rounded-full blur-3xl pointer-events-none group-hover:bg-violet-500/20 transition-colors duration-500" />
             </div>

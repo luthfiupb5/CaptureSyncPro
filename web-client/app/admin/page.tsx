@@ -11,10 +11,8 @@ import {
     LayoutGrid, List, Copy, Key
 } from "lucide-react";
 import { QRCodeCanvas } from "qrcode.react";
-// import { supabase } from "@/lib/supabase"; // Supabase removed
 import imageCompression from 'browser-image-compression';
 
-// Types
 interface Event {
     id: string;
     name: string;
@@ -36,41 +34,34 @@ interface AuthUser {
 export default function AdminDashboard() {
     const router = useRouter();
 
-    // Auth & Init State
     const [user, setUser] = useState<AuthUser | null>(null);
     const [authLoading, setAuthLoading] = useState(true);
     const [modelStatus, setModelStatus] = useState("Initializing AI...");
 
 
-    // Data State
     const [events, setEvents] = useState<Event[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
     const [photos, setPhotos] = useState<Photo[]>([]);
     const [loadingPhotos, setLoadingPhotos] = useState(false);
 
-    // New Credential State
     const [newCreds, setNewCreds] = useState<{ username: string, password: string } | null>(null);
     const [showCredsModal, setShowCredsModal] = useState(false);
-    const [viewingCreds, setViewingCreds] = useState<{ username: string, password: string } | null>(null); // For "Keys" button
+    const [viewingCreds, setViewingCreds] = useState<{ username: string, password: string } | null>(null);
     const [showQRModal, setShowQRModal] = useState(false);
 
-    // UI State
     const [uploadMode, setUploadMode] = useState<'direct' | 'studio'>('direct');
     const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
     const [isCreatingEvent, setIsCreatingEvent] = useState(false);
     const [newEventName, setNewEventName] = useState("");
 
-    // Upload & Processing State
     const [uploadQueue, setUploadQueue] = useState<File[]>([]);
     const [uploading, setUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
     const [processingStatus, setProcessingStatus] = useState("");
 
-    // Studio Mode specific
     const [landscapeOverlay, setLandscapeOverlay] = useState<HTMLImageElement | null>(null);
     const [portraitOverlay, setPortraitOverlay] = useState<HTMLImageElement | null>(null);
 
-    // Initial Load
     useEffect(() => {
         checkAuth();
     }, []);
@@ -91,7 +82,6 @@ export default function AdminDashboard() {
             setUser(data.user);
             fetchEvents(data.user);
 
-            // Load AI Models
             try {
                 await FaceMatcher.getInstance().loadModels();
                 setModelStatus("AI Engine Ready");
@@ -112,20 +102,18 @@ export default function AdminDashboard() {
             let data = await res.json();
             if (!Array.isArray(data)) data = [];
 
-            // STRICT ISOLATION: Program Admin only sees their own event
             if (currentUser.role === 'program_admin' && currentUser.eventId) {
-                // The API might return all events (in this simple implementation), so filter strictly here.
-                // ideally API should filter, but for this local file/JSON setup, filtering client-side is acceptable given typical trust model.
-                // However, the user asked for "they cant be knowing about this multiple events". 
-                // Since the updated GET /api/events returns *all* events with credentials, this is a security leak for program_admin.
-                // I should ideally update the API to strict filter. But for now I will strictly filter here and ensure UI doesn't render others.
+
+
+
+
 
                 const myEvent = data.find((e: any) => e.id === currentUser.eventId);
                 if (myEvent) {
                     setEvents([myEvent]);
                     setSelectedEvent(myEvent);
                 } else {
-                    setEvents([]); // Should not happen if DB is consistent
+                    setEvents([]);
                 }
             } else {
                 setEvents(data);
@@ -153,17 +141,15 @@ export default function AdminDashboard() {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ name: newEventName })
             });
-            const result = await res.json(); // Returns { event, credentials }
+            const result = await res.json();
 
             setEvents([...events, result.event]);
             setIsCreatingEvent(false);
             setNewEventName("");
 
-            // Show Credentials
             setNewCreds(result.credentials);
             setShowCredsModal(true);
 
-            // Only select if not already working on something (optional preference)
             setSelectedEvent(result.event);
         } catch (e) { alert("Failed to create event"); }
     };
@@ -219,7 +205,6 @@ export default function AdminDashboard() {
         }
     };
 
-    // --- Upload Logic ---
     const handleFiles = (files: FileList | null) => {
         if (!files) return;
         const imageFiles = Array.from(files).filter(f => f.type.startsWith('image/'));
@@ -242,11 +227,7 @@ export default function AdminDashboard() {
                 const imgUrl = URL.createObjectURL(file);
                 const img = await faceapi.fetchImage(imgUrl);
 
-                // --- OPTIMIZATION: Resize for Face Detection ONLY ---
-                // Detecting on 4K+ images is slow and unnecessary. 
-                // We scale down to ~800px width for detection, which is 10x faster.
                 const detectionScale = 800 / Math.max(img.width, img.height);
-                // If image is already small, don't scale up
                 const useScale = detectionScale < 1 ? detectionScale : 1;
 
                 let detectionInput: HTMLCanvasElement | HTMLImageElement = img;
@@ -264,11 +245,9 @@ export default function AdminDashboard() {
 
                 const detections = await faceapi.detectAllFaces(detectionInput).withFaceLandmarks().withFaceDescriptors();
                 const vectors = detections.map(d => Array.from(d.descriptor));
-                // ----------------------------------------------------
 
                 let blobToUpload = file;
 
-                // 2. Studio Mode Overlay (if enabled)
                 if (uploadMode === 'studio') {
                     const canvas = document.createElement('canvas');
                     canvas.width = img.width;
@@ -280,9 +259,7 @@ export default function AdminDashboard() {
                         const overlay = isLandscape ? landscapeOverlay : portraitOverlay;
                         if (overlay) {
                             ctx.drawImage(overlay, 0, 0, img.width, img.height);
-                            // Convert canvas to blob (High Quality)
                             const processedBlob = await new Promise<Blob | null>(resolve =>
-                                // user requested "without compressing", so we use 1.0 (max quality)
                                 canvas.toBlob(resolve, 'image/jpeg', 1.0)
                             );
                             if (processedBlob) blobToUpload = new File([processedBlob], file.name, { type: 'image/jpeg' });
@@ -290,8 +267,6 @@ export default function AdminDashboard() {
                     }
                 }
 
-                // 3. Upload DIRECTLY to Local API
-                // Removed imageCompression to satisfy "no quality loss" request.
                 const formData = new FormData();
                 formData.append('file', blobToUpload);
                 formData.append('eventId', selectedEvent.id);
@@ -319,7 +294,6 @@ export default function AdminDashboard() {
         fetchPhotos(selectedEvent.id);
     };
 
-    // --- Overlay Handlers ---
     const handleOverlaySelect = (e: React.ChangeEvent<HTMLInputElement>, type: 'landscape' | 'portrait') => {
         if (e.target.files && e.target.files[0]) {
             const reader = new FileReader();
@@ -345,9 +319,7 @@ export default function AdminDashboard() {
     return (
         <div className="flex h-screen bg-[var(--background)] text-[var(--foreground)] font-sans overflow-hidden">
 
-            {/* --- SIDEBAR --- */}
             <aside className={`flex-shrink-0 bg-[var(--surface)]/80 backdrop-blur-xl border-r border-[var(--border)] transition-all duration-300 flex flex-col relative z-20 ${sidebarCollapsed ? 'w-20 items-center' : 'w-72'}`}>
-                {/* Brand */}
                 <div className={`p-6 flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
                     <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white font-bold text-lg shadow-[0_0_15px_rgba(99,102,241,0.3)]">
                         <Zap size={20} className="fill-white" />
@@ -360,7 +332,6 @@ export default function AdminDashboard() {
                     )}
                 </div>
 
-                {/* Events List */}
                 <div className="flex-1 overflow-y-auto px-4 space-y-2 py-4">
                     {!sidebarCollapsed && <div className="px-2 pb-2 text-xs font-bold text-[var(--muted)] uppercase tracking-widest flex justify-between items-center group">
                         <span>Active Events</span>
@@ -387,7 +358,6 @@ export default function AdminDashboard() {
                             </button>
                             {!sidebarCollapsed && user?.role === 'super_admin' && (
                                 <div className="absolute right-2 top-1/2 -translate-y-1/2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-all z-10">
-                                    {/* View Creds Button */}
                                     <button
                                         onClick={(e) => {
                                             e.stopPropagation();
@@ -416,7 +386,6 @@ export default function AdminDashboard() {
                     ))}
                 </div>
 
-                {/* Footer User Profile */}
                 <div className="p-4 border-t border-[var(--border)] bg-black/20">
                     <div className={`flex items-center gap-3 ${sidebarCollapsed ? 'justify-center' : ''}`}>
                         <div className="w-10 h-10 rounded-full bg-gradient-to-br from-zinc-700 to-zinc-900 border border-[var(--border)] flex items-center justify-center text-sm font-bold text-white shadow-inner">
@@ -434,14 +403,11 @@ export default function AdminDashboard() {
                 </div>
             </aside>
 
-            {/* --- MAIN CONTENT --- */}
             <main className="flex-1 flex flex-col relative overflow-hidden bg-[var(--background)]">
-                {/* Ambient Background */}
                 <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-indigo-500/5 to-transparent pointer-events-none"></div>
 
                 {selectedEvent ? (
                     <>
-                        {/* Header Toolbar */}
                         <header className="h-20 border-b border-[var(--border)] px-8 flex items-center justify-between flex-shrink-0 bg-[var(--surface)]/50 backdrop-blur-md z-10 sticky top-0">
                             <div className="flex items-center gap-4">
                                 <h2 className="text-2xl font-display font-bold text-white tracking-tight">{selectedEvent.name}</h2>
@@ -461,10 +427,8 @@ export default function AdminDashboard() {
                             </div>
                         </header>
 
-                        {/* Scrollable Workspace */}
                         <div className="flex-1 overflow-y-auto p-8 space-y-8 cursor-default">
 
-                            {/* Stats Row */}
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                                 <div className="glass-panel p-6 rounded-2xl flex flex-col justify-between h-36 relative overflow-hidden group hover:border-indigo-500/30">
                                     <div className="relative z-10">
@@ -498,9 +462,7 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
-                            {/* UPLOAD & PROCESSING CONTROL */}
                             <div className="glass-panel rounded-2xl overflow-hidden shadow-2xl shadow-black/40 border-white/5">
-                                {/* Tab Switcher */}
                                 <div className="flex border-b border-white/5 bg-black/20">
                                     <button
                                         onClick={() => setUploadMode('direct')}
@@ -523,10 +485,8 @@ export default function AdminDashboard() {
                                 </div>
 
                                 <div className="p-10">
-                                    {/* Upload Area */}
                                     {!uploading ? (
                                         <div className="space-y-8">
-                                            {/* Studio Config - Only visible in studio mode */}
                                             {uploadMode === 'studio' && (
                                                 <div className="grid grid-cols-2 gap-6 p-6 rounded-2xl bg-black/20 border border-white/5 animate-fade-in">
                                                     <div>
@@ -583,7 +543,6 @@ export default function AdminDashboard() {
                                 </div>
                             </div>
 
-                            {/* GALLERY GRID */}
                             <div className="space-y-6">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-lg font-bold flex items-center gap-2 text-white"><ImageIcon size={20} className="text-indigo-400" /> Live Gallery</h3>
@@ -630,7 +589,6 @@ export default function AdminDashboard() {
                 )}
             </main>
 
-            {/* CREATE MODAL */}
             {isCreatingEvent && (
                 <div className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in">
                     <div className="glass-panel w-full max-w-sm rounded-2xl p-8 shadow-2xl animate-scale-in border border-white/10">
@@ -664,7 +622,6 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* CREATED CREDENTIALS MODAL */}
             {showCredsModal && newCreds && (
                 <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in p-4">
                     <div className="glass-panel w-full max-w-md rounded-2xl p-8 shadow-2xl animate-scale-in border border-indigo-500/30">
@@ -704,7 +661,6 @@ export default function AdminDashboard() {
                 </div>
             )}
 
-            {/* VIEW CREDENTIALS MODAL (For Super Admin) */}
             {viewingCreds && (
                 <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in p-4" onClick={() => setViewingCreds(null)}>
                     <div className="glass-panel w-full max-w-sm rounded-2xl p-6 shadow-2xl animate-scale-in border border-white/10" onClick={e => e.stopPropagation()}>
@@ -737,7 +693,6 @@ export default function AdminDashboard() {
                     </div>
                 </div>
             )}
-            {/* QR CODE MODAL */}
             {showQRModal && selectedEvent && (
                 <div className="fixed inset-0 z-[60] bg-black/90 backdrop-blur-md flex items-center justify-center animate-fade-in p-4" onClick={() => setShowQRModal(false)}>
                     <div className="glass-panel w-full max-w-sm rounded-2xl p-8 shadow-2xl animate-scale-in border border-white/10 text-center" onClick={e => e.stopPropagation()}>

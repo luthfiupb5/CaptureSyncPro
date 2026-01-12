@@ -1,7 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 
-// Types matching the previous Prisma schema
 export interface User {
     id: string;
     username: string;
@@ -62,7 +61,6 @@ class LocalDatabase {
             const raw = fs.readFileSync(DB_PATH, 'utf-8');
             try {
                 const parsed = JSON.parse(raw);
-                // Hydrate dates
                 this.data = {
                     users: parsed.users.map((u: any) => ({ ...u, createdAt: new Date(u.createdAt) })),
                     events: parsed.events.map((e: any) => ({ ...e, createdAt: new Date(e.createdAt) })),
@@ -85,7 +83,6 @@ class LocalDatabase {
         if (this.initialized) return;
         this.load();
 
-        // Seed Admin
         const admin = this.data.users.find(u => u.username === 'luthfi');
         if (!admin) {
             console.log("Seeding default super_admin...");
@@ -102,7 +99,6 @@ class LocalDatabase {
         this.initialized = true;
     }
 
-    // --- Users ---
     async getUser(username: string) {
         return this.data.users.find(u => u.username === username) || null;
     }
@@ -125,9 +121,8 @@ class LocalDatabase {
         return newUser;
     }
 
-    // --- Events ---
     async getEvents() {
-        this.load(); // Ensure fresh data from disk in case other processes modified it
+        this.load();
         return [...this.data.events].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
     }
 
@@ -141,10 +136,9 @@ class LocalDatabase {
         };
         this.data.events.push(newEvent);
 
-        // Auto-generate Program Admin
         const sanitized = name.toLowerCase().replace(/[^a-z0-9]/g, '');
-        const username = `${sanitized}.admin`; // e.g. "summergala.admin"
-        const password = Math.random().toString(36).slice(-8); // random 8 chars
+        const username = `${sanitized}.admin`;
+        const password = Math.random().toString(36).slice(-8);
 
         await this.createUser(username, password, 'program_admin', eventId);
 
@@ -159,7 +153,6 @@ class LocalDatabase {
             console.log(`[DB] Event found at index ${idx}, deleting...`);
             const deleted = this.data.events.splice(idx, 1)[0];
 
-            // FS Cleanup
             const eventDir = path.join(process.cwd(), 'public', 'uploads', id);
             if (fs.existsSync(eventDir)) {
                 try {
@@ -170,14 +163,12 @@ class LocalDatabase {
                 }
             }
 
-            // Cascade delete photos and vectors
             const initialPhotos = this.data.photos.length;
             this.data.photos = this.data.photos.filter(p => p.eventId !== id);
             console.log(`[DB] Deleted ${initialPhotos - this.data.photos.length} photos`);
 
             this.data.vectors = this.data.vectors.filter(v => v.eventId !== id);
 
-            // Cascade delete Program Admin
             const initialUsers = this.data.users.length;
             this.data.users = this.data.users.filter(u => u.eventId !== id);
             console.log(`[DB] Deleted ${initialUsers - this.data.users.length} users`);
@@ -191,22 +182,17 @@ class LocalDatabase {
         return null;
     }
 
-    // Helper to get admin creds for an event (Super Admin only)
-    // Helper to get admin creds for an event (Super Admin only)
     async getEventAdmin(eventId: string) {
-        this.load(); // Ensure fresh data
-        // In a real app, do not return passwords. Here checking for display purposes as requested.
+        this.load();
         const user = this.data.users.find(u => u.eventId === eventId && u.role === 'program_admin');
         if (user) return { username: user.username, password: user.password };
 
-        // Fallback: Lazy Migration for legacy events that have no admin
         const event = this.data.events.find(e => e.id === eventId);
         if (event) {
             console.log(`Lazy generating credentials for event: ${event.name}`);
             const sanitized = event.name.toLowerCase().replace(/[^a-z0-9]/g, '');
-            const username = `${sanitized}.admin`; // e.g. "summergala.admin"
+            const username = `${sanitized}.admin`;
 
-            // Check if username already exists to avoid conflict (append random if needed)
             let finalUsername = username;
             if (this.data.users.some(u => u.username === finalUsername)) {
                 finalUsername = `${username}.${Math.floor(Math.random() * 1000)}`;
@@ -226,15 +212,12 @@ class LocalDatabase {
         if (idx !== -1) {
             const deleted = this.data.photos.splice(idx, 1)[0];
 
-            // FS Cleanup
-            // url is like "/uploads/eventId/filename"
             const relativePath = deleted.url.startsWith('/') ? deleted.url.slice(1) : deleted.url;
             const absolutePath = path.join(process.cwd(), 'public', relativePath);
             if (fs.existsSync(absolutePath)) {
                 fs.unlinkSync(absolutePath);
             }
 
-            // Cascade delete vectors
             this.data.vectors = this.data.vectors.filter(v => v.photoId !== id);
             this.save();
             return deleted;
@@ -242,7 +225,6 @@ class LocalDatabase {
         return null;
     }
 
-    // --- Photos & Matching ---
     async addPhotoWithVectors(url: string, eventId: string, vectors: number[][]) {
         const photo: Photo = {
             id: crypto.randomUUID(),

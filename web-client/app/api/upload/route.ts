@@ -18,16 +18,13 @@ export async function POST(req: Request) {
         const buffer = Buffer.from(await file.arrayBuffer());
         const filename = `${Date.now()}-${file.name.replace(/\s/g, '_')}`;
 
-        // Ensure directory exists
         const uploadDir = path.join(process.cwd(), 'public', 'uploads', eventId);
         await mkdir(uploadDir, { recursive: true });
 
-        // Write file
         const relativePath = `/uploads/${eventId}/${filename}`;
         const absolutePath = path.join(uploadDir, filename);
         await writeFile(absolutePath, buffer);
 
-        // Save to DB
         const vectors = JSON.parse(vectorsStr);
         const photo = await db.addPhotoWithVectors(relativePath, eventId, vectors);
 

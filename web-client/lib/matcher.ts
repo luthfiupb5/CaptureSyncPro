@@ -41,7 +41,6 @@ export class FaceMatcher {
     public async findMatches(selfieUrl: string): Promise<string[]> {
         if (!this.modelsLoaded) await this.loadModels();
 
-        // Detect face in selfie
         const img = await faceapi.fetchImage(selfieUrl);
         const detection = await faceapi.detectSingleFace(img).withFaceLandmarks().withFaceDescriptor();
 
@@ -52,16 +51,14 @@ export class FaceMatcher {
 
         const selfieVector = detection.descriptor;
         const matches: string[] = [];
-        const threshold = 0.55; // Tunable threshold
+        const threshold = 0.55;
 
-        // Brute-force search (optimize with KD-Tree if n > 1000)
         for (const entry of this.index) {
             for (const vector of entry.vectors) {
-                // Ensure vector is Float32Array or array
                 const dist = faceapi.euclideanDistance(selfieVector, vector);
                 if (dist < threshold) {
                     matches.push(entry.image);
-                    break; // Matched this image once, no need to check other faces in same image
+                    break;
                 }
             }
         }

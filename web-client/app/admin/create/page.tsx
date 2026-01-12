@@ -33,15 +33,12 @@ export default function CreateEventPage() {
         for (let i = 0; i < images.length; i++) {
             const file = images[i];
             try {
-                // Convert File to Image HTML Element
                 const imgUrl = URL.createObjectURL(file);
                 const img = await faceapi.fetchImage(imgUrl);
 
-                // Detect faces
                 const detections = await faceapi.detectAllFaces(img).withFaceLandmarks().withFaceDescriptors();
 
-                // Extract vectors
-                const vectors = detections.map(d => Array.from(d.descriptor)); // Float32Array to number[]
+                const vectors = detections.map(d => Array.from(d.descriptor));
 
                 if (vectors.length > 0) {
                     newIndex.push({
@@ -50,7 +47,7 @@ export default function CreateEventPage() {
                     });
                 }
 
-                URL.revokeObjectURL(imgUrl); // Cleanup
+                URL.revokeObjectURL(imgUrl);
             } catch (e) {
                 console.error(`Error processing ${file.name}`, e);
             }
@@ -93,7 +90,6 @@ export default function CreateEventPage() {
                 </header>
 
                 <div className="bg-gray-900 rounded-xl border border-white/10 overflow-hidden">
-                    {/* Step 1: Upload */}
                     <div className="p-8 border-b border-white/5">
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                             <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">1</span>
@@ -113,7 +109,6 @@ export default function CreateEventPage() {
                         </div>
                     </div>
 
-                    {/* Step 2: Process */}
                     <div className={`p-8 border-b border-white/5 ${images.length === 0 ? 'opacity-30 pointer-events-none' : ''}`}>
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                             <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">2</span>
@@ -157,7 +152,6 @@ export default function CreateEventPage() {
                         )}
                     </div>
 
-                    {/* Step 3: Download */}
                     <div className={`p-8 ${!indexData ? 'opacity-30 pointer-events-none' : ''}`}>
                         <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
                             <span className="bg-purple-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm">3</span>

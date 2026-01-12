@@ -12,10 +12,6 @@ export async function GET() {
 
     const [userId, role, eventId] = session.value.split(':');
 
-    // In a real app we would verify this against DB, but for MVP we trust the cookie
-    // or re-fetch to be safe
-    // const user = await db.getUserById(userId); 
-
     return NextResponse.json({
         user: {
             id: userId,
